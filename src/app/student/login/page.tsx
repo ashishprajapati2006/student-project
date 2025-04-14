@@ -35,6 +35,7 @@ const StudentLoginPage = () => {
       rollNo,
       branch,
       email,
+      status: 'pending', // Add status field
     };
 
     // Store student data in localStorage
@@ -43,6 +44,16 @@ const StudentLoginPage = () => {
     if (storedStudents) {
       students = JSON.parse(storedStudents);
     }
+
+        // Check for duplicate roll numbers
+        if (students.some((s: { rollNo: string; }) => s.rollNo === rollNo)) {
+          toast({
+            title: "Error",
+            description: "Roll number already exists. Please enter a unique roll number.",
+            variant: "destructive",
+          });
+          return;
+        }
     students.push(student);
     localStorage.setItem("students", JSON.stringify(students));
 
