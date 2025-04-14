@@ -3,14 +3,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 
 interface Student {
   name: string;
   rollNo: string;
   branch: string;
   email: string;
-  status: string; // Added status field
 }
 
 const StudentDataDisplay = () => {
@@ -23,49 +21,6 @@ const StudentDataDisplay = () => {
       setStudents(JSON.parse(storedStudents));
     }
   }, []);
-
-  const handleApprove = (rollNo: string) => {
-    updateStudentStatus(rollNo, "approved");
-  };
-
-  const handleReject = (rollNo: string) => {
-    updateStudentStatus(rollNo, "rejected");
-  };
-
-  const updateStudentStatus = async (rollNo: string, status: string) => {
-    const updatedStudents = students.map((student) =>
-      student.rollNo === rollNo ? { ...student, status: status } : student
-    );
-    setStudents(updatedStudents);
-    localStorage.setItem("students", JSON.stringify(updatedStudents));
-
-    // Send confirmation email (only for approval)
-    if (status === "approved") {
-      const student = updatedStudents.find((s) => s.rollNo === rollNo);
-      if (student) {
-        await sendConfirmationEmail(student.email, student.name);
-      }
-    }
-  };
-
-  const sendConfirmationEmail = async (email: string, name: string) => {
-    try {
-      const res = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, name }),
-      });
-
-      if (!res.ok) {
-        console.error('Failed to send email');
-      }
-    } catch (error) {
-      console.error('Error sending email:', error);
-    }
-  };
-
 
   return (
     <div className="container py-10">
@@ -85,8 +40,6 @@ const StudentDataDisplay = () => {
                 <TableHead>Roll No.</TableHead>
                 <TableHead>Branch</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -96,33 +49,6 @@ const StudentDataDisplay = () => {
                   <TableCell>{student.rollNo}</TableCell>
                   <TableCell>{student.branch}</TableCell>
                   <TableCell>{student.email}</TableCell>
-                  <TableCell>{student.status}</TableCell>
-                  <TableCell>
-                    {student.status === "pending" && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleApprove(student.rollNo)}
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleReject(student.rollNo)}
-                        >
-                          Reject
-                        </Button>
-                      </>
-                    )}
-                    {student.status === "approved" && (
-                      <span>Approved</span>
-                    )}
-                    {student.status === "rejected" && (
-                      <span>Rejected</span>
-                    )}
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
