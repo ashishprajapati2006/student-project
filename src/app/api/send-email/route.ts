@@ -9,14 +9,14 @@ export async function POST(req: Request) {
     const transporter = nodemailer.createTransport({
       service: 'gmail', // Use your email service
       auth: {
-        user: process.env.NEXT_PUBLIC_SMTP_EMAIL,
+        user: 'ashish2772006@gmail.com',
         pass: process.env.NEXT_PUBLIC_SMTP_PASSWORD,
       },
     });
 
     // Email message options
     const mailOptions = {
-      from: process.env.NEXT_PUBLIC_SMTP_EMAIL,
+      from: 'ashish2772006@gmail.com',
       to: email,
       subject: 'Registration Approved',
       html: `<p>Dear ${name},</p><p>Your registration has been approved by the admin.</p>`,
