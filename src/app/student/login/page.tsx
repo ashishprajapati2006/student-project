@@ -35,6 +35,7 @@ const StudentLoginPage = () => {
       rollNo,
       branch,
       email,
+      status: "pending", // Initial status: pending
     };
 
     // Store student data in localStorage
@@ -48,7 +49,7 @@ const StudentLoginPage = () => {
 
     toast({
       title: "Success",
-      description: "Student data saved successfully!",
+      description: "Student data saved successfully! Awaiting admin approval.",
     });
     router.push("/"); // Redirect to home page
   };
