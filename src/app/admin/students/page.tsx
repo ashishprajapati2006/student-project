@@ -1,14 +1,35 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { toast } from "@/hooks/use-toast";
+import { CheckCircle, XCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 
 interface Student {
   name: string;
   rollNo: string;
   branch: string;
   email: string;
+  status: "pending" | "approved" | "rejected";
 }
 
 const StudentDataDisplay = () => {
@@ -21,6 +42,22 @@ const StudentDataDisplay = () => {
       setStudents(JSON.parse(storedStudents));
     }
   }, []);
+
+  const updateStudentStatus = (
+    rollNo: string,
+    newStatus: "pending" | "approved" | "rejected"
+  ) => {
+    const updatedStudents = students.map((student) =>
+      student.rollNo === rollNo ? { ...student, status: newStatus } : student
+    );
+    setStudents(updatedStudents);
+    localStorage.setItem("students", JSON.stringify(updatedStudents));
+
+    toast({
+      title: "Success",
+      description: `Student ${rollNo} status updated to ${newStatus}!`,
+    });
+  };
 
   return (
     <div className="container py-10">
@@ -40,15 +77,85 @@ const StudentDataDisplay = () => {
                 <TableHead>Roll No.</TableHead>
                 <TableHead>Branch</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {students.map((student) => (
-                <TableRow key={student.rollNo}>
+                <TableRow key={`${student.name}-${student.rollNo}-${student.email}`}>
                   <TableCell className="font-medium">{student.name}</TableCell>
                   <TableCell>{student.rollNo}</TableCell>
                   <TableCell>{student.branch}</TableCell>
                   <TableCell>{student.email}</TableCell>
+                  <TableCell>
+                    {student.status === "pending" && (
+                      <Badge variant="secondary">Pending</Badge>
+                    )}
+                    {student.status === "approved" && (
+                      <Badge variant="default">Approved</Badge>
+                    )}
+                    {student.status === "rejected" && (
+                      <Badge variant="destructive">Rejected</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="flex items-center justify-center space-x-2">
+                    {student.status === "pending" && (
+                      <>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Approve Student</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to approve{" "}
+                                {student.name}?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() =>
+                                  updateStudentStatus(student.rollNo, "approved")
+                                }
+                              >
+                                Approve
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <XCircle className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Reject Student</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to reject {student.name}?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() =>
+                                  updateStudentStatus(student.rollNo, "rejected")
+                                }
+                              >
+                                Reject
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
