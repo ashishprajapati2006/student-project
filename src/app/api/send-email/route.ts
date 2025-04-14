@@ -35,11 +35,17 @@ export async function POST(req: Request) {
     console.log('Sending email with options:', mailOptions);
 
     // Send the email
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.messageId);
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent:', info.messageId);
 
-    return NextResponse.json({ message: 'Email sent successfully' }, { status: 200 });
-  } catch (error) {
+        return NextResponse.json({ message: 'Email sent successfully' }, { status: 200 });
+    } catch (sendError: any) {
+        console.error('Error sending email:', sendError);
+        return NextResponse.json({ message: `Failed to send email: ${sendError.message}` }, { status: 500 });
+    }
+
+  } catch (error: any) {
     console.error('Error sending email:', error);
     return NextResponse.json({ message: 'Failed to send email' }, { status: 500 });
   }
