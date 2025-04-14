@@ -87,17 +87,18 @@ const StudentDataDisplay = () => {
             description: `Confirmation email sent to ${email}!`,
           });
         } else {
+          const errorData = await response.json();
           toast({
             title: "Email Failed",
-            description: `Failed to send confirmation email to ${email}.`,
+            description: errorData.message || `Failed to send confirmation email to ${email}.`,
             variant: "destructive",
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error sending email:", error);
         toast({
           title: "Email Error",
-          description: `Error sending confirmation email to ${email}.`,
+          description: error.message || `Error sending confirmation email to ${email}.`,
           variant: "destructive",
         });
       }
