@@ -18,7 +18,17 @@ import {
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -43,9 +53,11 @@ const StudentDataDisplay = () => {
     }
   }, []);
 
-  const updateStudentStatus = (
+  const updateStudentStatus = async (
     rollNo: string,
-    newStatus: "pending" | "approved" | "rejected"
+    newStatus: "pending" | "approved" | "rejected",
+    email: string,
+    name: string
   ) => {
     const updatedStudents = students.map((student) =>
       student.rollNo === rollNo ? { ...student, status: newStatus } : student
@@ -57,6 +69,39 @@ const StudentDataDisplay = () => {
       title: "Success",
       description: `Student ${rollNo} status updated to ${newStatus}!`,
     });
+
+    if (newStatus === "approved") {
+      // Send confirmation email
+      try {
+        const response = await fetch("/api/send-email", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: email, name: name }),
+        });
+
+        if (response.ok) {
+          toast({
+            title: "Email Sent",
+            description: `Confirmation email sent to ${email}!`,
+          });
+        } else {
+          toast({
+            title: "Email Failed",
+            description: `Failed to send confirmation email to ${email}.`,
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error sending email:", error);
+        toast({
+          title: "Email Error",
+          description: `Error sending confirmation email to ${email}.`,
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   return (
@@ -83,7 +128,7 @@ const StudentDataDisplay = () => {
             </TableHeader>
             <TableBody>
               {students.map((student) => (
-                <TableRow key={`${student.name}-${student.rollNo}-${student.email}`}>
+                <TableRow key={student.rollNo}>
                   <TableCell className="font-medium">{student.name}</TableCell>
                   <TableCell>{student.rollNo}</TableCell>
                   <TableCell>{student.branch}</TableCell>
@@ -120,7 +165,12 @@ const StudentDataDisplay = () => {
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction
                                 onClick={() =>
-                                  updateStudentStatus(student.rollNo, "approved")
+                                  updateStudentStatus(
+                                    student.rollNo,
+                                    "approved",
+                                    student.email,
+                                    student.name
+                                  )
                                 }
                               >
                                 Approve
@@ -145,7 +195,12 @@ const StudentDataDisplay = () => {
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction
                                 onClick={() =>
-                                  updateStudentStatus(student.rollNo, "rejected")
+                                  updateStudentStatus(
+                                    student.rollNo,
+                                    "rejected",
+                                    student.email,
+                                    student.name
+                                  )
                                 }
                               >
                                 Reject
