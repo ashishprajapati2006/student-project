@@ -52,6 +52,13 @@ const StudentLoginPage = () => {
       description: "Student data saved successfully! Awaiting admin approval.",
     });
     router.push("/"); // Redirect to home page
+
+      // Clear the form fields
+      setName("");
+      setRollNo("");
+      setBranch("");
+      setEmail("");
+      setPassword("");
   };
 
   return (
