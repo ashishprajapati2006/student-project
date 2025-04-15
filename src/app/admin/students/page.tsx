@@ -171,6 +171,7 @@ const StudentDataDisplay = () => {
                                     "approved",
                                     student.email,
                                     student.name
+                                  , "admin@example.com" // Placeholder for admin email
                                   )
                                 }
                               >
@@ -201,6 +202,7 @@ const StudentDataDisplay = () => {
                                     "rejected",
                                     student.email,
                                     student.name
+                                  , "admin@example.com" // Placeholder for admin email
                                   )
                                 }
                               >

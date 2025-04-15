@@ -6,8 +6,11 @@ export async function POST(req: Request) {
     const { email, name } = await req.json();
 
     // Ensure the admin's email and password are set in environment variables
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-    const adminPassword = process.env.NEXT_PUBLIC_SMTP_PASSWORD;
+    // const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+    // const adminPassword = process.env.NEXT_PUBLIC_SMTP_PASSWORD;
+    const adminEmail = process.env.SMTP_EMAIL;
+    const adminPassword = process.env.SMTP_PASSWORD;
+
 
     if (!adminEmail || !adminPassword) {
       console.error('Admin email or password not configured in environment variables.');
